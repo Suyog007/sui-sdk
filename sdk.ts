@@ -51,7 +51,8 @@ async function executeTransaction() {
 
 	  // creating a new transactionBlock for place and list
 	  let txb = new TransactionBlock();
-
+	  
+	  let kioskObjId = objectIDs[0];
       let itemObj = txb.object(objectIDs[2]);
 	  let kioskArg = txb.object(objectIDs[0]);
 	  let kioskOwnerCapArg = txb.object(objectIDs[1]);
@@ -64,6 +65,7 @@ async function executeTransaction() {
         })
 	  // signing the transaction for place_and_list
 	  await client.signAndExecuteTransactionBlock({ signer: keypair, transactionBlock: txb });
+	  await objectDetails(kioskObjId);
 
     } catch (error) {
       // Handle potential errors if the promise rejects
@@ -71,7 +73,36 @@ async function executeTransaction() {
     }
   }
 
-executeTransaction();
+
+async function objectDetails(obj:any){
+	// obj is objectID in string
+	try {
+		const txn = await client.getObject({
+			id: obj,
+			// fetch the object content field
+			options: { showContent: true },
+		});
+		let data: any;
+		data = txn.data;
+		let fields = data.content.fields;
+		console.log(fields);
+
+		/* the output of the fields is 
+		{
+			allow_extensions: false,
+			id: {
+			  id: '0x830fc2b6d1dbba732f479842bfd624afcfda6660c24377a932548b017571726e'
+			},
+			item_count: 1,
+			owner: '0x36306131687cf3eea75cf05e17d4919a3d0c605f462591e652834015f466fe1d',
+			profits: '0'
+		  } */
+		  
+	  } catch (error) {
+		// Handle potential errors if the promise rejects
+		console.error(error);
+	  }
+}
 
 async function getCreatedObject() {
     try {
@@ -119,4 +150,5 @@ async function getCreatedObject() {
     }
   }
 
+  executeTransaction();
 
